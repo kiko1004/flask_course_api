@@ -5,6 +5,8 @@ from models import *
 from flask_migrate import Migrate
 from db import db
 from decouple import config
+from schemas import *
+from resources import *
 
 app = Flask(__name__)
 db_user = config('DB_USER')
@@ -15,6 +17,7 @@ db.init_app(app)
 migrate = Migrate(app, db)
 app.app_context().push()
 api = Api(app)
+api.add_resource(SignUp, "/register")
 
 if __name__ == "__main__":
     db.create_all()
