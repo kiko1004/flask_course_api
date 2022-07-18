@@ -1,4 +1,5 @@
 from marshmallow import Schema, fields, validates, ValidationError, validate, validates_schema
+from password_strength import PasswordPolicy
 
 
 class UserSingUpSchema(Schema):
@@ -9,10 +10,18 @@ class UserSingUpSchema(Schema):
     password = fields.String(required=True, validate=validate.And(validate.Length(min=8, max=20)))
 
     @validates_schema
-    def validate_email(self, data, **kwargs):
+    def validate_data(self, data, **kwargs):
         if len(data['email']) < 3:
             raise ValidationError('Email must be more than 3 characters', 'email')
         if len(data['first_name']) < 3:
             raise ValidationError('First name must be more than 3 characters', 'email')
         if len(data['last_name']) < 3:
             raise ValidationError('Last name must be more than 3 characters', 'email')
+        errors = PasswordPolicy.from_names(uppercase=1).test(data['password'])
+        if errors:
+            raise ValidationError("Not a valid password. {}".format(errors))
+
+
+class LoginSchema(Schema):
+    email = fields.String(required= True)
+    password = fields.String(required= True)

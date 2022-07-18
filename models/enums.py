@@ -7,7 +7,7 @@ class UserRole(Enum):
     admin = "Admin"
 
 
-class ComplaintState(Enum):
-    pending = "Pending"
-    approved = "Approved"
-    rejected = "Rejected"
+class AnalysisType(Enum):
+    balance_sheet = "Balance Sheet"
+    recommendation = "Recommendation"
+    analysis = "Aanalysis"

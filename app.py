@@ -18,6 +18,8 @@ migrate = Migrate(app, db)
 app.app_context().push()
 api = Api(app)
 api.add_resource(SignUp, "/register")
+api.add_resource(Login, "/login")
+api.add_resource(Recommendation, "/recommendation")
 
 if __name__ == "__main__":
     db.create_all()

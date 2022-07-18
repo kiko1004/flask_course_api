@@ -1,0 +1,1 @@
+from functionalities.recommendations import *
