@@ -37,6 +37,9 @@ class AnalystsModel(BaseUserModel):
             )
         except Exception as e:
             raise e
+    @staticmethod
+    def decode_token(token):
+        return jwt.decode(token, config('SECRET_KEY'), algorithms=["HS256"])['sub']
 
 
 class AdminModel(BaseUserModel):
