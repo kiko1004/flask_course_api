@@ -22,6 +22,7 @@ api.add_resource(Login, "/login")
 api.add_resource(Recommendation, "/recommendation")
 api.add_resource(BalanceSheet, "/balancesheet")
 api.add_resource(Analysis, '/analysis')
+api.add_resource(PaymentProcessor, '/upgrade')
 
 if __name__ == "__main__":
     db.create_all()
