@@ -20,6 +20,8 @@ api = Api(app)
 api.add_resource(SignUp, "/register")
 api.add_resource(Login, "/login")
 api.add_resource(Recommendation, "/recommendation")
+api.add_resource(BalanceSheet, "/balancesheet")
+api.add_resource(Analysis, '/analysis')
 
 if __name__ == "__main__":
     db.create_all()

@@ -12,9 +12,11 @@ class Recommender:
         self.res = res
 
     def get_balancesheet(self):
-        return yf.Ticker(self.ticker).balancesheet.reset_index().astype('str').to_dict('r')
+        df = yf.Ticker(self.ticker).balancesheet.reset_index()
+        df.columns = [str(i) for i in df.columns]
+        self.res = df.astype('str').to_dict('r')
 
     def get_analysis(self):
-        return yf.Ticker(self.ticker).analysis.reset_index().astype('str').to_dict('r')
+        self.res = yf.Ticker(self.ticker).analysis.reset_index().astype('str').to_dict('r')
 
 
