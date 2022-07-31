@@ -10,6 +10,7 @@ import stripe
 
 auth = HTTPTokenAuth(scheme='Bearer')
 stripe_sk = config('STRIPE_SK')
+endpoint_secret = config('ENDPOING_SECRET')
 stripe.api_key = stripe_sk
 
 @auth.verify_token
@@ -40,13 +41,44 @@ class PaymentProcessor(Resource):
         )
         return checkout_session.url, 200
 
-class success_payment(Resource):
+class SuccessfulPayment(Resource):
     def get(selfs):
         data = request.args.to_dict()
         user_id = AnalystsModel.decode_token(token=data['token'])
         user = AnalystsModel.query.filter_by(id=user_id).first()
         user.role = UserRole.Premium
         db.session.commit()
-        return "Successful Payment", 200
+        return f"Successful Payment, User: {user.email}", 200
 
-    #TODO: Build resource
+class FailedPayment(Resource):
+    def get(selfs):
+        data = request.args.to_dict()
+        user_id = AnalystsModel.decode_token(token=data['token'])
+        user = AnalystsModel.query.filter_by(id=user_id).first()
+        return f"Payment Failed, User: {user.email}", 200
+
+class Webhook(Resource):
+    def post(self):
+        event = None
+        payload = request.data
+        sig_header = request.headers['STRIPE_SIGNATURE']
+
+        try:
+            event = stripe.Webhook.construct_event(
+                payload, sig_header, endpoint_secret
+            )
+        except ValueError as e:
+            # Invalid payload
+            raise e
+        except stripe.error.SignatureVerificationError as e:
+            # Invalid signature
+            raise e
+
+        # Handle the event
+        if event['type'] == 'payment_intent.succeeded':
+            payment_intent = event['data']['object']
+            #Webhook integration when alive
+
+        # ... handle other event types
+        else:
+            print('Unhandled event type {}'.format(event['type']))
