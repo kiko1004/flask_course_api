@@ -26,6 +26,8 @@ api.add_resource(PaymentProcessor, '/upgrade')
 api.add_resource(SuccessfulPayment, '/success_payment')
 api.add_resource(FailedPayment, '/failed_payment')
 api.add_resource(Webhook, '/webhook')
+api.add_resource(ViewMyAnalysis, '/view_my_analysis')
+
 if __name__ == "__main__":
     db.create_all()
     app.run(debug=True)

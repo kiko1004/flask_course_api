@@ -16,9 +16,10 @@ class SignUp(Resource):
         if not errors:
             data["password"] = generate_password_hash(data['password'], method='sha256')
             user = AnalystsModel(**data)
-            token = user.encode_token()
             db.session.add(user)
             db.session.commit()
+            user = AnalystsModel.query.filter_by(email=user.email).first()
+            token = user.encode_token()
             return {'token': token}, 201
         return errors
 

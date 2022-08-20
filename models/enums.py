@@ -8,6 +8,6 @@ class UserRole(Enum):
 
 
 class AnalysisType(Enum):
-    balance_sheet = "Balance Sheet"
-    recommendation = "Recommendation"
-    analysis = "Aanalysis"
+    balance_sheet = "balance_sheet"
+    recommendation = "recommendation"
+    analysis = "analysis"

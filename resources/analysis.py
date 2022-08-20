@@ -1,9 +1,9 @@
 from functionalities import Recommender
 from flask_restful import Resource, abort
-from flask import request
+from flask import request, jsonify
 from werkzeug.security import generate_password_hash, check_password_hash
 from db import db
-from models import AnalystsModel, AnalysisModel
+from models import AnalystsModel, AnalysisModel, AnalysisType
 from schemas import *
 from flask_httpauth import HTTPTokenAuth
 
@@ -46,7 +46,7 @@ class Recommendation(Resource):
                 params = {
                     'analyst_id': curr_user.id,
                     'ticker': data['ticker'],
-                    'type': 'recommendation',
+                    'type': AnalysisType.recommendation.name,
                 }
                 analysis = AnalysisModel(**params)
                 db.session.add(analysis)
@@ -72,7 +72,7 @@ class BalanceSheet(Resource):
                 params = {
                     'analyst_id': curr_user.id,
                     'ticker': data['ticker'],
-                    'type': 'balance sheet',
+                    'type': AnalysisType.balance_sheet.name,
                 }
                 analysis = AnalysisModel(**params)
                 db.session.add(analysis)
@@ -97,7 +97,7 @@ class Analysis(Resource):
                 params = {
                     'analyst_id': curr_user.id,
                     'ticker': data['ticker'],
-                    'type': 'analysis',
+                    'type': AnalysisType.analysis.name,
                 }
                 analysis = AnalysisModel(**params)
                 db.session.add(analysis)
@@ -106,3 +106,18 @@ class Analysis(Resource):
             except:
                 return "Wrong ticker", 400
         return errors, 400
+
+class ViewMyAnalysis(Resource):
+    @auth.login_required
+    def get(self):
+        curr_user = auth.current_user()
+        data = AnalysisModel.query.filter_by(analyst_id=curr_user.id).all()
+        data = [i.as_dict() for i in data]
+        response = []
+        for entry in data:
+            entry['type'] = entry['type'].name
+            entry['created_on'] = entry['created_on'].strftime('%Y-%m-%d')
+            del entry['updated_on']
+            response.append(entry)
+        return response, 200
+

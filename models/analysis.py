@@ -13,3 +13,6 @@ class AnalysisModel(db.Model):
     created_on = db.Column(db.DateTime, nullable=False, server_default=func.now())
     updated_on = db.Column(db.DateTime, onupdate=func.now())
     relationship = db.relationship("AnalystsModel")
+
+    def as_dict(self):
+        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
