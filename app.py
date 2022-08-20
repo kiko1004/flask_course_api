@@ -1,36 +1,31 @@
-from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
-from flask_restful import Api, Resource
-from models import *
-from flask_migrate import Migrate
-from db import db
-from decouple import config
-from schemas import *
 from resources import *
+from config import create_app
+from psycopg2.errorcodes import UNIQUE_VIOLATION
+from werkzeug.exceptions import BadRequest, InternalServerError
 
-app = Flask(__name__)
-db_user = config('DB_USER')
-db_password = config("DB_PASSWORD")
-database = config("DATABASE")
-app.config['SQLALCHEMY_DATABASE_URI'] = f'postgresql://{db_user}:{db_password}@localhost:5432/{database}'
-db.init_app(app)
-migrate = Migrate(app, db)
-app.app_context().push()
-api = Api(app)
-api.add_resource(SignUp, "/register")
-api.add_resource(Login, "/login")
-api.add_resource(Recommendation, "/recommendation")
-api.add_resource(BalanceSheet, "/balancesheet")
-api.add_resource(Analysis, '/analysis')
-api.add_resource(PaymentProcessor, '/upgrade')
-api.add_resource(SuccessfulPayment, '/success_payment')
-api.add_resource(FailedPayment, '/failed_payment')
-api.add_resource(Webhook, '/webhook')
-api.add_resource(ViewMyAnalysis, '/view_my_analysis')
+app = create_app()
+
+@app.before_first_request
+def init_request():
+    db.init_app(app)
+    db.create_all()
+
+
+@app.after_request
+def conclude_request(resp):
+    try:
+        db.session.commit()
+    except Exception as ex:
+        if ex.orig.pgcode == UNIQUE_VIOLATION:
+            raise BadRequest("Please login")
+        else:
+            raise InternalServerError("Server is unavailable. Please try again later")
+    return resp
+
 
 if __name__ == "__main__":
-    db.create_all()
-    app.run(debug=True)
+    app.run()
+
 
 
 
