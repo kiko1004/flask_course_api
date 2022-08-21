@@ -77,7 +77,7 @@ class Webhook(Resource):
         # Handle the event
         if event['type'] == 'payment_intent.succeeded':
             payment_intent = event['data']['object']
-            #Webhook integration when alive
+            #TODO: Webhook integration when alive
 
         # ... handle other event types
         else:

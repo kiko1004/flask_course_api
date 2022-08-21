@@ -27,7 +27,7 @@ class TestApplicationConfiguration:
 
 def create_app(config = "config.DevApplicationConfiguration"):
     app = Flask(__name__)
-    app.config.from_object(DevApplicationConfiguration)
+    app.config.from_object(config)
     migrate = Migrate(app, db)
     CORS(app)
     api = Api(app)

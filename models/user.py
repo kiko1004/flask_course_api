@@ -1,6 +1,10 @@
 import jwt
+from jwt import ExpiredSignatureError, InvalidTokenError
 from sqlalchemy import func
 from datetime import datetime, timedelta
+
+from werkzeug.exceptions import Unauthorized
+
 from db import db
 from models.enums import UserRole
 from decouple import config
@@ -37,9 +41,18 @@ class AnalystsModel(BaseUserModel):
             )
         except Exception as e:
             raise e
+
     @staticmethod
     def decode_token(token):
-        return jwt.decode(token, config('SECRET_KEY'), algorithms=["HS256"])['sub']
+        if not token:
+            raise Unauthorized("Missing token")
+        try:
+            payload = jwt.decode(token, key=config("SECRET_KEY"), algorithms=["HS256"])
+            return payload["sub"]
+        except ExpiredSignatureError:
+            raise Unauthorized("Token expired")
+        except InvalidTokenError:
+            raise Unauthorized("Invalid token")
 
 
 class AdminModel(BaseUserModel):

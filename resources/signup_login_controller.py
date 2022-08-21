@@ -16,11 +16,20 @@ class SignUp(Resource):
         if not errors:
             data["password"] = generate_password_hash(data['password'], method='sha256')
             user = AnalystsModel(**data)
-            db.session.add(user)
-            db.session.commit()
-            user = AnalystsModel.query.filter_by(email=user.email).first()
-            token = user.encode_token()
-            return {'token': token}, 201
+            try:
+                db.session.add(user)
+                db.session.commit()
+                user = AnalystsModel.query.filter_by(email=user.email).first()
+                token = user.encode_token()
+                return {'token': token}, 201
+            except Exception as ex:
+                if 'already exists' in ex._message():
+                    return {'message': 'User already exists!'}, 409
+                else:
+                    return {'message': ex._message()}, 500
+
+
+
         return errors
 
 

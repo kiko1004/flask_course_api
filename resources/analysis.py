@@ -6,6 +6,7 @@ from db import db
 from models import AnalystsModel, AnalysisModel, AnalysisType
 from schemas import *
 from flask_httpauth import HTTPTokenAuth
+from werkzeug.exceptions import BadRequest, Forbidden
 
 auth = HTTPTokenAuth(scheme='Bearer')
 
@@ -24,7 +25,7 @@ def permission_required(permission):
         def decorated_function(*args, **kwargs):
             user = auth.current_user()
             if not user.role.name == permission:
-                abort(403)
+                raise Forbidden("Permission denied!")
             return f(*args, **kwargs)
 
         return decorated_function
