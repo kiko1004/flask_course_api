@@ -1,4 +1,8 @@
-from marshmallow import Schema, fields, validates, ValidationError, validate, validates_schema
+from marshmallow import (
+    Schema,
+    fields,
+)
+
 
 class Ticker(Schema):
     ticker = fields.String(required=True)

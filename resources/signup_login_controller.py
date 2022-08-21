@@ -1,10 +1,9 @@
-from flask_restful import Resource
 from flask import request
+from flask_restful import Resource
 from werkzeug.security import generate_password_hash, check_password_hash
+
 from db import db
 from models import AnalystsModel
-
-
 from schemas import *
 
 
@@ -14,21 +13,19 @@ class SignUp(Resource):
         schema = UserSingUpSchema()
         errors = schema.validate(data)
         if not errors:
-            data["password"] = generate_password_hash(data['password'], method='sha256')
+            data["password"] = generate_password_hash(data["password"], method="sha256")
             user = AnalystsModel(**data)
             try:
                 db.session.add(user)
                 db.session.commit()
                 user = AnalystsModel.query.filter_by(email=user.email).first()
                 token = user.encode_token()
-                return {'token': token}, 201
+                return {"token": token}, 201
             except Exception as ex:
-                if 'already exists' in ex._message():
-                    return {'message': 'User already exists!'}, 409
+                if "already exists" in ex._message():
+                    return {"message": "User already exists!"}, 409
                 else:
-                    return {'message': ex._message()}, 500
-
-
+                    return {"message": ex._message()}, 500
 
         return errors
 
@@ -39,11 +36,11 @@ class Login(Resource):
         schema = LoginSchema()
         errors = schema.validate(data)
         if not errors:
-            user = AnalystsModel.query.filter_by(email=data['email']).first()
-            logged_in = check_password_hash(user.password, data['password'])
+            user = AnalystsModel.query.filter_by(email=data["email"]).first()
+            logged_in = check_password_hash(user.password, data["password"])
             if logged_in:
                 token = user.encode_token()
-                return {'token': token}, 200
+                return {"token": token}, 200
             else:
-                return 'Wrong email or password', 401
+                return "Wrong email or password", 401
         return errors

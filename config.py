@@ -2,9 +2,8 @@ from flask import Flask
 from flask_cors import CORS
 from flask_migrate import Migrate
 from flask_restful import Api
-from resources import *
 
-from db import db
+from resources import *
 
 
 class DevApplicationConfiguration:
@@ -25,7 +24,7 @@ class TestApplicationConfiguration:
     )
 
 
-def create_app(config = "config.DevApplicationConfiguration"):
+def create_app(config="config.DevApplicationConfiguration"):
     app = Flask(__name__)
     app.config.from_object(config)
     migrate = Migrate(app, db)

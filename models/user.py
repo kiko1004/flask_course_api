@@ -1,13 +1,14 @@
-import jwt
-from jwt import ExpiredSignatureError, InvalidTokenError
-from sqlalchemy import func
 from datetime import datetime, timedelta
 
+import jwt
+from decouple import config
+from jwt import ExpiredSignatureError, InvalidTokenError
+from sqlalchemy import func
 from werkzeug.exceptions import Unauthorized
 
 from db import db
 from models.enums import UserRole
-from decouple import config
+
 
 class BaseUserModel(db.Model):
     __abstract__ = True
@@ -22,23 +23,15 @@ class BaseUserModel(db.Model):
     updated_on = db.Column(db.DateTime, onupdate=func.now())
 
 
-
 class AnalystsModel(BaseUserModel):
-    __tablename__ = 'analysts'
-    analysis = db.relationship("AnalysisModel", backref="analysis", lazy='dynamic')
+    __tablename__ = "analysts"
+    analysis = db.relationship("AnalysisModel", backref="analysis", lazy="dynamic")
     role = db.Column(db.Enum(UserRole), default=UserRole.Basic, nullable=False)
 
     def encode_token(self):
         try:
-            payload = {
-                'exp': datetime.utcnow() + timedelta(days=2),
-                'sub': self.id
-            }
-            return jwt.encode(
-                payload,
-                key=config('SECRET_KEY'),
-                algorithm='HS256'
-            )
+            payload = {"exp": datetime.utcnow() + timedelta(days=2), "sub": self.id}
+            return jwt.encode(payload, key=config("SECRET_KEY"), algorithm="HS256")
         except Exception as e:
             raise e
 
@@ -56,5 +49,5 @@ class AnalystsModel(BaseUserModel):
 
 
 class AdminModel(BaseUserModel):
-    __tablename__ = 'admins'
+    __tablename__ = "admins"
     role = db.Column(db.Enum(UserRole), default=UserRole.admin, nullable=False)

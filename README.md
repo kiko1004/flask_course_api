@@ -27,5 +27,19 @@ The project consists of several endpoints:
     '/view_my_analysis' - views user analysis performed, requires token
 ```
 
+Required environment variables:
+
+```
+DB_USER
+DB_PASSWORD
+DATABASE
+SECRET_KEY
+STRIPE_PK
+STRIPE_SK
+ENDPOING_SECRET
+TEST_DATABASE
+DB_PORT
+```
+
 ## Developers
 * Kiril Spiridonov
